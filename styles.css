@@ -73,3 +73,24 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .right{text-align:right}
 .small{font-size:12px}
 .danger{color:#b00020}
+
+/* ===== PWA extras ===== */
+body{
+  -webkit-tap-highlight-color: transparent;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+header .wrap{padding-top: calc(16px + env(safe-area-inset-top));}
+button, input, select{touch-action: manipulation;}
+.pwaToast{
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 50;
+  background: rgba(255,255,255,.95);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 12px;
+}
+.pwaToast .row{justify-content: space-between; align-items: center;}

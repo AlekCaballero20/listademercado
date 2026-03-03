@@ -2,16 +2,28 @@
 <html lang="es-CO">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="color-scheme" content="light" />
-  <title>Market Checklist · MVP</title>
+
+  <title>Market Checklist</title>
+  <meta name="description" content="Checklist de mercado con carrito, historial y stats. Funciona offline como PWA." />
+  <meta name="theme-color" content="#0C41C4" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/icons/icon-192.png" sizes="192x192" />
+  <link rel="icon" href="./assets/icons/icon-512.png" sizes="512x512" />
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
   <link rel="stylesheet" href="./styles.css" />
 </head>
 
 <body>
 <header>
   <div class="wrap">
-    <h1>🛒 Market Checklist <span class="pill">v1 modular</span></h1>
+    <h1>🛒 Market Checklist <span class="pill">PWA</span></h1>
   </div>
 </header>
 
@@ -107,7 +119,9 @@
           <input id="totalPaid" type="number" min="0" step="1" placeholder="Total pagado (opcional)" style="flex:1;min-width:160px" />
           <button class="ok" id="btnCheckout" style="flex:1;min-width:160px">✅ Guardar compra</button>
         </div>
-        <div class="sub small muted" style="margin-top:8px">El presupuesto se calcula con precios unitarios. “Total pagado” es por si el recibo quedó distinto.</div>
+        <div class="sub small muted" style="margin-top:8px">
+          El presupuesto se calcula con precios unitarios. “Total pagado” es por si el recibo quedó distinto.
+        </div>
 
         <div class="hr"></div>
 
@@ -125,6 +139,7 @@
   </div>
 </main>
 
+<!-- App -->
 <script type="module" src="./js/app.js"></script>
 </body>
 </html>
