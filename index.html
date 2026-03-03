@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Market Checklist · MVP</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+<header>
+  <div class="wrap">
+    <h1>🛒 Market Checklist <span class="pill">v1 modular</span></h1>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <section class="card">
+      <div class="hd">
+        <div>
+          <div class="title">Checklist</div>
+          <div class="sub">Agrega cosas, mándalas al carrito, registra compras y mira frecuencias.</div>
+        </div>
+        <button class="ghost mini" id="btnReset">Reset (con dolor)</button>
+      </div>
+
+      <div class="bd">
+        <div class="row">
+          <input id="newName" placeholder="Ej: Huevos, arroz, chocolate..." style="flex:1;min-width:200px" />
+          <select id="newCategory">
+            <option value="Alacena">Alacena</option>
+            <option value="Frescos">Frescos</option>
+            <option value="Aseo">Aseo</option>
+            <option value="Hogar">Hogar</option>
+            <option value="Bebidas">Bebidas</option>
+            <option value="Salsas">Salsas</option>
+            <option value="Galguerías">Galguerías</option>
+            <option value="Otros">Otros</option>
+          </select>
+          <select id="newTag">
+            <option value="base">Base</option>
+            <option value="antojo">Antojo</option>
+          </select>
+          <button id="btnAdd">+ Agregar</button>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row">
+          <input id="q" placeholder="Buscar..." style="flex:1;min-width:200px" />
+          <select id="filterTag">
+            <option value="all">Todos</option>
+            <option value="base">Base</option>
+            <option value="antojo">Antojo</option>
+          </select>
+          <select id="filterCategory">
+            <option value="all">Todas las categorías</option>
+            <option>Alacena</option><option>Frescos</option><option>Aseo</option><option>Hogar</option>
+            <option>Bebidas</option><option>Salsas</option><option>Galguerías</option><option>Otros</option>
+          </select>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="kpi" id="kpi"></div>
+
+        <div class="hr"></div>
+
+        <div class="title">Items</div>
+        <div class="sub">“+ Carrito” para la próxima ida. “Compré hoy” registra frecuencia.</div>
+        <div style="height:10px"></div>
+        <div class="list" id="itemsList"></div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <div class="hd">
+        <div>
+          <div class="title">Carrito (esta ida)</div>
+          <div class="sub">Aquí se viene a recordar lo que el cerebro decidió olvidar.</div>
+        </div>
+        <button class="ghost mini" id="btnClearCart">Vaciar</button>
+      </div>
+
+      <div class="bd">
+        <div class="list" id="cartList"></div>
+
+        <div style="height:10px"></div>
+        <div id="cartBudget"></div>
+
+        <div class="hr"></div>
+
+        <div class="title">Finalizar compra</div>
+        <div class="row" style="margin-top:8px">
+          <select id="buyType" style="flex:1;min-width:160px">
+            <option value="Mercado grande">Mercado grande</option>
+            <option value="Reposición">Reposición</option>
+            <option value="Antojos">Antojos</option>
+            <option value="Aseo">Aseo</option>
+            <option value="Mixto">Mixto</option>
+          </select>
+          <input id="store" placeholder="Tienda (D1, Ara...)" style="flex:1;min-width:160px" />
+        </div>
+        <div class="row" style="margin-top:8px">
+          <input id="totalPaid" type="number" min="0" step="1" placeholder="Total pagado (opcional)" style="flex:1;min-width:160px" />
+          <button class="ok" id="btnCheckout" style="flex:1;min-width:160px">✅ Guardar compra</button>
+        </div>
+        <div class="sub small muted" style="margin-top:8px">El presupuesto se calcula con precios unitarios. “Total pagado” es por si el recibo quedó distinto.</div>
+
+        <div class="hr"></div>
+
+        <div class="title">Historial (últimas 10)</div>
+        <table class="table" id="historyTable"></table>
+
+        <div class="hr"></div>
+
+        <div class="title">Stats rápidos</div>
+        <div class="sub">Frecuencia por ítem y gasto mensual estimado por categoría.</div>
+        <div style="height:10px"></div>
+        <div id="stats"></div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>
