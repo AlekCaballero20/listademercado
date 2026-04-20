@@ -12,8 +12,8 @@ const CORE_ASSETS = [
   './styles.css',
   './manifest.webmanifest',
   './offline.html',
-  './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png',
+  './assets/icons/icons-192.png',
+  './assets/icons/icons-512.png',
 
   // JS módulos
   './js/app.js',
