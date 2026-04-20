@@ -117,6 +117,52 @@ export function priceChangePct(db, itemId, mode = 'base') {
   return ((last - ref) / ref) * 100;
 }
 
+/* =========================
+   KPIs de gasto mensual
+========================= */
+
+export function spendThisMonth(db) {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  return db.purchases
+    .filter(p => p.date >= start)
+    .reduce((a, p) => a + Number(p.total || 0), 0);
+}
+
+/**
+ * Promedio de gasto mensual usando los últimos N meses completos con datos.
+ * Excluye el mes actual (puede estar incompleto).
+ * Si solo hay datos del mes actual, devuelve ese total.
+ */
+export function avgMonthlySpend(db, { months = 3 } = {}) {
+  if (!Array.isArray(db.purchases) || !db.purchases.length) return 0;
+
+  const now = new Date();
+  const currentKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+  // Agrupar por YYYY-MM
+  const byMonth = {};
+  for (const p of db.purchases) {
+    const d = new Date(p.date);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    byMonth[key] = (byMonth[key] || 0) + Number(p.total || 0);
+  }
+
+  const pastKeys = Object.keys(byMonth)
+    .filter(k => k !== currentKey)
+    .sort()
+    .reverse()
+    .slice(0, months);
+
+  if (!pastKeys.length) {
+    // Solo hay datos del mes actual
+    return Math.round(byMonth[currentKey] || 0);
+  }
+
+  const total = pastKeys.reduce((a, k) => a + byMonth[k], 0);
+  return Math.round(total / pastKeys.length);
+}
+
 export function cheapestStoreForItem(db, itemId, { days = 180 } = {}) {
   const hist = priceHistoryForItem(db, itemId, { days });
   if (!hist.length) return null;
