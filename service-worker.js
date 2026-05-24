@@ -1,7 +1,7 @@
 /* service-worker.js — Market Checklist PWA
    Optimizado para GitHub Pages / hosting estático */
 
-const VERSION = 'mc-pwa-v1.1.0'; // 🔁 Cambia esto cuando hagas deploy
+const VERSION = 'mc-pwa-v2.0.0-firebase'; // 🔁 Cambia esto cuando hagas deploy
 const STATIC_CACHE = `static-${VERSION}`;
 const RUNTIME_CACHE = `runtime-${VERSION}`;
 
@@ -20,7 +20,9 @@ const CORE_ASSETS = [
   './js/pwa.js',
   './js/state.js',
   './js/models.js',
-  './js/storage.local.js',
+  './js/firebase.config.js',
+  './js/firebase.store.js',
+  './js/auth.js',
   './js/ui.actions.js',
   './js/ui.render.js',
   './js/metrics.js',

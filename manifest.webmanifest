@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Market Checklist · Control de Mercado",
   "short_name": "Market",
-  "description": "Checklist de mercado con carrito inteligente, historial de compras y estadísticas. Funciona offline como aplicación instalada.",
+  "description": "Checklist de mercado con Firebase, carrito inteligente, historial de compras, precios y estadísticas.",
   "lang": "es-CO",
 
   "start_url": "./?source=pwa",

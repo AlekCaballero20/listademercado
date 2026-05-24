@@ -6,10 +6,9 @@
   <meta name="color-scheme" content="light" />
 
   <title>Market Checklist</title>
-  <meta name="description" content="Checklist de mercado con carrito, historial y stats. Funciona offline como PWA." />
+  <meta name="description" content="Checklist de mercado con Firebase, carrito, historial, precios y estadísticas." />
   <meta name="theme-color" content="#0C41C4" />
 
-  <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./assets/icons/icons-192.png" sizes="192x192" />
   <link rel="icon" href="./assets/icons/icons-512.png" sizes="512x512" />
@@ -22,25 +21,58 @@
 
 <body>
 <header>
-  <div class="wrap">
-    <h1>🛒 Market Checklist <span class="pill">PWA</span></h1>
+  <div class="wrap topbar">
+    <div class="brand">
+      <div class="brandIcon" aria-hidden="true">🛒</div>
+      <div>
+        <h1>Market Checklist <span class="pill">Firebase</span></h1>
+        <div class="sub">Lista, carrito, precios y memoria de compras sin depender del bendito localStorage.</div>
+      </div>
+    </div>
+
+    <div class="topActions">
+      <div class="syncChip" id="syncStatus">Sin conectar</div>
+      <div class="userChip" id="userChip" hidden></div>
+      <button class="ghost mini" id="btnLogin">Entrar con Google</button>
+      <button class="ghost mini" id="btnLogout" hidden>Salir</button>
+    </div>
   </div>
 </header>
 
 <main class="wrap">
-  <div class="grid">
+  <section class="hero card">
+    <div>
+      <div class="eyebrow">Control de mercado</div>
+      <div class="heroTitle">Compra sin repetir, sin olvidar y sin adivinar precios.</div>
+      <div class="sub">Ahora los datos viven en Firebase para que el mercado no dependa de un navegador caprichoso. La civilización avanza tres centímetros.</div>
+    </div>
+    <div class="heroMini">
+      <div class="miniStat"><span>Modo</span><b>Compartido</b></div>
+      <div class="miniStat"><span>Datos</span><b>Firestore</b></div>
+    </div>
+  </section>
+
+  <section class="card bootCard" id="bootCard">
+    <div class="bd">
+      <div class="title" id="bootTitle">Preparando app...</div>
+      <div class="sub" id="bootText">Conectando con Firebase.</div>
+    </div>
+  </section>
+
+  <div class="grid appGrid" id="appContent" hidden>
     <section class="card">
       <div class="hd">
         <div>
           <div class="title">Checklist</div>
-          <div class="sub">Agrega cosas, mándalas al carrito, registra compras y mira frecuencias.</div>
+          <div class="sub">Agrega productos con precio desde el inicio. Sí, por fin, qué concepto tan revolucionario.</div>
         </div>
-        <button class="ghost mini" id="btnReset">Reset (con dolor)</button>
+        <button class="ghost mini" id="btnReset">Reset</button>
       </div>
 
       <div class="bd">
-        <div class="row">
-          <input id="newName" placeholder="Ej: Huevos, arroz, chocolate..." style="flex:1;min-width:200px" />
+        <div class="quickAdd">
+          <input id="newName" placeholder="Ej: Huevos, arroz, chocolate..." />
+          <input id="newBasePrice" type="number" min="0" step="1" inputmode="numeric" placeholder="Precio base COP" />
           <select id="newCategory">
             <option value="Alacena">Alacena</option>
             <option value="Frescos">Frescos</option>
@@ -60,8 +92,8 @@
 
         <div class="hr"></div>
 
-        <div class="row">
-          <input id="q" placeholder="Buscar..." style="flex:1;min-width:200px" />
+        <div class="toolbar">
+          <input id="q" placeholder="Buscar producto..." />
           <select id="filterTag">
             <option value="all">Todos</option>
             <option value="base">Base</option>
@@ -80,18 +112,22 @@
 
         <div class="hr"></div>
 
-        <div class="title">Items</div>
-        <div class="sub">✏️ para editar · "+ Carrito" para la próxima ida · "Compré" registra la compra.</div>
+        <div class="sectionHead">
+          <div>
+            <div class="title">Items</div>
+            <div class="sub">✏️ editar · + Carrito para la próxima ida · Compré para registro rápido.</div>
+          </div>
+        </div>
         <div style="height:10px"></div>
         <div class="list" id="itemsList"></div>
       </div>
     </section>
 
-    <aside class="card">
+    <aside class="card sideCard">
       <div class="hd">
         <div>
-          <div class="title">Carrito (esta ida)</div>
-          <div class="sub">Aquí se viene a recordar lo que el cerebro decidió olvidar.</div>
+          <div class="title">Carrito</div>
+          <div class="sub">Lo que esta ida necesita antes de que el cerebro se vaya de excursión.</div>
         </div>
         <button class="ghost mini" id="btnClearCart">Vaciar</button>
       </div>
@@ -123,38 +159,36 @@
           <button class="ok" id="btnCheckout" style="flex:1">✅ Guardar compra</button>
         </div>
         <div class="sub small muted" style="margin-top:8px">
-          La fecha aplica también a "Compré" en la lista. Sin fecha = hoy.
+          La fecha aplica también a “Compré”. Sin fecha = hoy.
         </div>
 
         <div class="hr"></div>
 
-        <div class="title">Historial (últimas 10)</div>
+        <div class="title">Historial</div>
         <table class="table" id="historyTable"></table>
 
         <div class="hr"></div>
 
         <div class="title">Stats rápidos</div>
-        <div class="sub">Frecuencia por ítem y gasto mensual estimado por categoría.</div>
+        <div class="sub">Frecuencia por ítem, gasto estimado, cambios de precio y tiendas más baratas.</div>
         <div style="height:10px"></div>
         <div id="stats"></div>
 
         <div class="hr"></div>
 
         <div class="title">Datos y backup</div>
-        <div class="sub">Exporta o importa todo el historial en JSON. El CSV es para abrir en Excel.</div>
+        <div class="sub">Exporta o importa JSON. Al importar, el archivo reemplaza la base en Firebase.</div>
         <div class="row" style="margin-top:10px;flex-wrap:wrap;gap:8px">
           <button class="ghost mini" id="btnExportBackup">📥 Exportar backup</button>
           <button class="ghost mini" id="btnImportBackup">📤 Importar backup</button>
           <button class="ghost mini" id="btnExportCSV">📊 Exportar CSV</button>
         </div>
-        <!-- input oculto para importar archivo -->
         <input type="file" id="importFile" accept=".json" style="display:none" />
       </div>
     </aside>
   </div>
 </main>
 
-<!-- Edit dialog (nativo, sin librerías) -->
 <dialog id="editDialog" aria-labelledby="editDialogTitle">
   <div class="title" id="editDialogTitle">✏️ Editar item</div>
   <div style="height:12px"></div>
@@ -191,7 +225,6 @@
   </div>
 </dialog>
 
-<!-- App -->
 <script type="module" src="./js/app.js"></script>
 </body>
 </html>
