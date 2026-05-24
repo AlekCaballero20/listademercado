@@ -11,7 +11,53 @@ import {
   avgMonthlySpend,
 } from "./metrics.js";
 
+
+export function renderBootState(message, type = "info") {
+  const boot = $("#bootCard");
+  const content = $("#appContent");
+  const title = $("#bootTitle");
+  const text = $("#bootText");
+  if (boot) boot.hidden = false;
+  if (content) content.hidden = true;
+  if (title) title.textContent = type === "error" ? "No se pudo cargar" : "Preparando app";
+  if (text) text.textContent = message || "Conectando...";
+  boot?.classList.toggle("bootError", type === "error");
+}
+
+export function renderAuthState(user) {
+  const userChip = $("#userChip");
+  const login = $("#btnLogin");
+  const logoutBtn = $("#btnLogout");
+
+  if (!user) {
+    if (userChip) { userChip.hidden = true; userChip.textContent = ""; }
+    if (login) login.hidden = false;
+    if (logoutBtn) logoutBtn.hidden = true;
+    return;
+  }
+
+  if (userChip) {
+    userChip.hidden = false;
+    userChip.textContent = user.email || "Cuenta Google";
+  }
+  if (login) login.hidden = true;
+  if (logoutBtn) logoutBtn.hidden = false;
+}
+
+export function renderSyncStatus(status = {}) {
+  const el = $("#syncStatus");
+  if (!el) return;
+  const text = status.text || "Sin conectar";
+  el.textContent = text;
+  el.title = status.detail || "";
+  el.dataset.phase = status.phase || "idle";
+}
+
 export function renderAll(db) {
+  const boot = $("#bootCard");
+  const content = $("#appContent");
+  if (boot) boot.hidden = true;
+  if (content) content.hidden = false;
   renderKPIs(db);
   renderItems(db);
   renderCart(db);

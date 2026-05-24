@@ -10,6 +10,7 @@ export function bindActions() {
   // Add item
   document.querySelector("#btnAdd").addEventListener("click", addItem);
   document.querySelector("#newName").addEventListener("keydown", (e) => { if (e.key === "Enter") addItem(); });
+  document.querySelector("#newBasePrice").addEventListener("keydown", (e) => { if (e.key === "Enter") addItem(); });
 
   // Filters
   document.querySelector("#q").addEventListener("input", () => renderAll(getDB()));
@@ -47,9 +48,9 @@ export function bindActions() {
   document.querySelector("#btnCheckout").addEventListener("click", checkout);
 
   // Reset
-  document.querySelector("#btnReset").addEventListener("click", () => {
-    if (!confirm("¿Seguro? Esto borra TODO.")) return;
-    resetDB();
+  document.querySelector("#btnReset").addEventListener("click", async () => {
+    if (!confirm("¿Seguro? Esto borra TODO en Firebase.")) return;
+    await resetDB();
     renderAll(getDB());
   });
 
@@ -89,6 +90,8 @@ function addItem() {
   const name = nameEl.value.trim();
   const category = document.querySelector("#newCategory").value;
   const tag = document.querySelector("#newTag").value;
+  const priceEl = document.querySelector("#newBasePrice");
+  const basePrice = Math.max(0, Math.floor(Number(priceEl.value) || 0)) || null;
 
   if (!name) return;
 
@@ -109,6 +112,10 @@ function addItem() {
       // Actualizar categoría/tag solo si el item no tenía valores útiles
       if (!inactiveMatch.category || inactiveMatch.category === "Otros") inactiveMatch.category = category;
       if (!inactiveMatch.tag) inactiveMatch.tag = tag;
+      if (basePrice) {
+        inactiveMatch.basePrice = basePrice;
+        inactiveMatch.lastPrice = basePrice;
+      }
       return db;
     }
 
@@ -120,8 +127,8 @@ function addItem() {
       tag,
       active: true,
       createdAt: Date.now(),
-      basePrice: null,
-      lastPrice: null,
+      basePrice,
+      lastPrice: basePrice,
       lastStore: "",
       lastAt: null,
     });
@@ -129,6 +136,7 @@ function addItem() {
   });
 
   nameEl.value = "";
+  priceEl.value = "";
   renderAll(getDB());
 }
 
@@ -429,7 +437,7 @@ function handleImportFile(e) {
       }
 
       const ok = confirm(
-        `¿Reemplazar el DB actual con este backup?\n\n` +
+        `¿Reemplazar la base actual de Firebase con este backup?\n\n` +
         `• ${parsed.items.length} items\n` +
         `• ${Array.isArray(parsed.purchases) ? parsed.purchases.length : 0} compras\n\n` +
         `Esta acción NO se puede deshacer.`
