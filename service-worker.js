@@ -1,7 +1,7 @@
 /* service-worker.js — Market Checklist PWA
    Optimizado para GitHub Pages / hosting estático */
 
-const VERSION = 'mc-pwa-v2.0.0-firebase'; // 🔁 Cambia esto cuando hagas deploy
+const VERSION = 'mc-pwa-v2.1.0-saved-lists'; // cache update for saved lists
 const STATIC_CACHE = `static-${VERSION}`;
 const RUNTIME_CACHE = `runtime-${VERSION}`;
 

@@ -20,6 +20,7 @@ Esta versión guarda la información en Cloud Firestore, en un único documento 
 - El estado se sincroniza con Firestore en tiempo real.
 - Al agregar un producto ya puedes poner el precio base de una vez.
 - El carrito usa el último precio conocido o el precio base como sugerencia.
+- Puedes guardar el carrito como una lista pendiente compartida sin afectar precios, historial ni compras.
 - Al guardar una compra, se actualizan últimos precios, tienda e historial.
 
 ## Nota técnica

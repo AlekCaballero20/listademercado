@@ -28,6 +28,8 @@ export function bindActions() {
     if (act === "cartInc")      cartAdd(id, 1);
     if (act === "cartDec")      cartAdd(id, -1);
     if (act === "cartRemove")   cartRemove(id);
+    if (act === "loadList")     loadSavedList(id);
+    if (act === "deleteList")   deleteSavedList(id);
     if (act === "buyNow")       buyNow(id);
     if (act === "setBasePrice") setBasePrice(id);
     if (act === "deactivate")   deactivate(id);
@@ -43,6 +45,7 @@ export function bindActions() {
 
   // Clear cart
   document.querySelector("#btnClearCart").addEventListener("click", clearCart);
+  document.querySelector("#btnSaveList").addEventListener("click", saveCartAsList);
 
   // Checkout
   document.querySelector("#btnCheckout").addEventListener("click", checkout);
@@ -167,6 +170,59 @@ function clearCart() {
   patch((db) => {
     db.cart = {};
     db.cartPrices = {}; // limpiar todos los precios huérfanos
+    return db;
+  });
+  renderAll(getDB());
+}
+
+function saveCartAsList() {
+  const dbNow = getDB();
+  const cartEntries = Object.entries(dbNow.cart);
+  if (!cartEntries.length) {
+    alert("Agrega algo al carrito antes de guardar la lista.");
+    return;
+  }
+
+  const nameEl = document.querySelector("#listName");
+  const name = nameEl.value.trim() || "Lista pendiente";
+
+  patch((db) => {
+    db.savedLists.push({
+      id: uid(), name, createdAt: Date.now(),
+      items: cartEntries.map(([itemId, qtyRaw]) => {
+        const item = db.items.find(x => x.id === itemId);
+        const unitPrice = Math.max(0, Math.floor(Number(db.cartPrices?.[itemId]) || Number(item?.lastPrice) || Number(item?.basePrice) || 0));
+        return { itemId, name: item?.name || "Producto", qty: Number(qtyRaw) || 1, unitPrice: unitPrice || null };
+      }),
+    });
+    db.cart = {};
+    db.cartPrices = {};
+    return db;
+  });
+  nameEl.value = "";
+  renderAll(getDB());
+}
+
+function loadSavedList(listId) {
+  patch((db) => {
+    const list = db.savedLists.find(x => x.id === listId);
+    if (!list) return db;
+    for (const line of list.items || []) {
+      const item = db.items.find(x => x.id === line.itemId && x.active);
+      if (!item) continue;
+      db.cart[item.id] = Number(db.cart[item.id] || 0) + (Number(line.qty) || 1);
+      if (Number(line.unitPrice) > 0 && !db.cartPrices[item.id]) db.cartPrices[item.id] = Number(line.unitPrice);
+    }
+    return db;
+  });
+  renderAll(getDB());
+}
+
+function deleteSavedList(listId) {
+  const list = getDB().savedLists.find(x => x.id === listId);
+  if (!list || !confirm(`¿Eliminar “${list.name}”?`)) return;
+  patch((db) => {
+    db.savedLists = db.savedLists.filter(x => x.id !== listId);
     return db;
   });
   renderAll(getDB());

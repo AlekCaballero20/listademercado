@@ -20,7 +20,7 @@ export function makeItem({ name, category = "Otros", tag = "base", basePrice = n
 
 export function seedDB() {
   return {
-    version: 3,
+    version: 4,
     items: [
       makeItem({ name: "Huevos",         category: "Frescos",    tag: "base",   basePrice: 16000 }),
       makeItem({ name: "Arroz",          category: "Alacena",    tag: "base",   basePrice: 6000  }),
@@ -30,6 +30,7 @@ export function seedDB() {
     ],
     cart: {},        // itemId -> qty
     cartPrices: {},  // itemId -> unitPrice (solo para presupuesto de la compra actual)
+    savedLists: [],  // listas pendientes para que otra persona haga la compra
     purchases: [],   // {id,date,type,store,total,estimatedTotal, items:[{itemId,qty,unitPrice,lineTotal}]}
     settings: { currency: "COP" }
   };
@@ -98,6 +99,14 @@ export function migrate(db) {
 
     db.version = 3;
   }
+
+  // v3 -> v4: listas pendientes separadas del historial de compras
+  if (db.version === 3) {
+    if (!Array.isArray(db.savedLists)) db.savedLists = [];
+    db.version = 4;
+  }
+
+  if (!Array.isArray(db.savedLists)) db.savedLists = [];
 
   return db;
 }
