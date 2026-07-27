@@ -28,8 +28,6 @@ export function bindActions() {
     if (act === "cartInc")      cartAdd(id, 1);
     if (act === "cartDec")      cartAdd(id, -1);
     if (act === "cartRemove")   cartRemove(id);
-    if (act === "loadList")     loadSavedList(id);
-    if (act === "deleteList")   deleteSavedList(id);
     if (act === "buyNow")       buyNow(id);
     if (act === "setBasePrice") setBasePrice(id);
     if (act === "deactivate")   deactivate(id);
@@ -45,7 +43,8 @@ export function bindActions() {
 
   // Clear cart
   document.querySelector("#btnClearCart").addEventListener("click", clearCart);
-  document.querySelector("#btnSaveList").addEventListener("click", saveCartAsList);
+  document.querySelector("#btnShareList").addEventListener("click", shareCartAsText);
+  document.querySelector("#btnPrintList").addEventListener("click", printCartAsPdf);
 
   // Checkout
   document.querySelector("#btnCheckout").addEventListener("click", checkout);
@@ -175,57 +174,51 @@ function clearCart() {
   renderAll(getDB());
 }
 
-function saveCartAsList() {
+function cartListLines() {
   const dbNow = getDB();
-  const cartEntries = Object.entries(dbNow.cart);
-  if (!cartEntries.length) {
-    alert("Agrega algo al carrito antes de guardar la lista.");
-    return;
-  }
-
-  const nameEl = document.querySelector("#listName");
-  const name = nameEl.value.trim() || "Lista pendiente";
-
-  patch((db) => {
-    db.savedLists.push({
-      id: uid(), name, createdAt: Date.now(),
-      items: cartEntries.map(([itemId, qtyRaw]) => {
-        const item = db.items.find(x => x.id === itemId);
-        const unitPrice = Math.max(0, Math.floor(Number(db.cartPrices?.[itemId]) || Number(item?.lastPrice) || Number(item?.basePrice) || 0));
-        return { itemId, name: item?.name || "Producto", qty: Number(qtyRaw) || 1, unitPrice: unitPrice || null };
-      }),
-    });
-    db.cart = {};
-    db.cartPrices = {};
-    return db;
-  });
-  nameEl.value = "";
-  renderAll(getDB());
+  return Object.entries(dbNow.cart)
+    .map(([itemId, qty]) => ({ item: dbNow.items.find(x => x.id === itemId), qty: Number(qty) || 1 }))
+    .filter(x => x.item)
+    .sort((a, b) => a.item.category.localeCompare(b.item.category, "es") || a.item.name.localeCompare(b.item.name, "es"));
 }
 
-function loadSavedList(listId) {
-  patch((db) => {
-    const list = db.savedLists.find(x => x.id === listId);
-    if (!list) return db;
-    for (const line of list.items || []) {
-      const item = db.items.find(x => x.id === line.itemId && x.active);
-      if (!item) continue;
-      db.cart[item.id] = Number(db.cart[item.id] || 0) + (Number(line.qty) || 1);
-      if (Number(line.unitPrice) > 0 && !db.cartPrices[item.id]) db.cartPrices[item.id] = Number(line.unitPrice);
+function buildCartText() {
+  const lines = cartListLines();
+  const date = new Date().toLocaleDateString("es-CO");
+  const grouped = lines.reduce((acc, line) => {
+    (acc[line.item.category] ||= []).push(line);
+    return acc;
+  }, {});
+  const body = Object.entries(grouped).map(([category, group]) =>
+    `${category}:\n${group.map(({ item, qty }) => `☐ ${item.name} x${qty}`).join("\n")}`
+  ).join("\n\n");
+  return `🛒 Lista de mercado\n${date}\n\n${body}\n\n¡Gracias!`;
+}
+
+async function shareCartAsText() {
+  if (!cartListLines().length) return alert("Agrega algo al carrito antes de compartir la lista.");
+  const text = buildCartText();
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: "Lista de mercado", text });
+    } else {
+      await navigator.clipboard.writeText(text);
+      alert("Lista copiada. Ya puedes pegarla y enviarla.");
     }
-    return db;
-  });
-  renderAll(getDB());
+  } catch (error) {
+    if (error?.name !== "AbortError") alert("No se pudo compartir la lista. Intenta copiarla de nuevo.");
+  }
 }
 
-function deleteSavedList(listId) {
-  const list = getDB().savedLists.find(x => x.id === listId);
-  if (!list || !confirm(`¿Eliminar “${list.name}”?`)) return;
-  patch((db) => {
-    db.savedLists = db.savedLists.filter(x => x.id !== listId);
-    return db;
-  });
-  renderAll(getDB());
+function printCartAsPdf() {
+  const lines = cartListLines();
+  if (!lines.length) return alert("Agrega algo al carrito antes de crear el PDF.");
+  const escape = value => String(value).replace(/[&<>\"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '\"': "&quot;" })[char]);
+  const items = lines.map(({ item, qty }) => `<li><span>${escape(item.name)}</span><b>x${qty}</b></li>`).join("");
+  const popup = window.open("", "_blank");
+  if (!popup) return alert("Permite las ventanas emergentes para crear el PDF.");
+  popup.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Lista de mercado</title><style>body{font-family:Arial,sans-serif;color:#172033;margin:36px;max-width:680px}h1{margin:0;color:#0c41c4}p{color:#657083}ul{padding:0;list-style:none;border-top:1px solid #dbe1ea}li{display:flex;justify-content:space-between;padding:12px 4px;border-bottom:1px solid #dbe1ea;font-size:16px}li:before{content:'☐';margin-right:10px;color:#0c41c4}li span{flex:1}footer{margin-top:28px;color:#657083;font-size:13px}@media print{body{margin:22px}}</style></head><body><h1>🛒 Lista de mercado</h1><p>${new Date().toLocaleDateString("es-CO")}</p><ul>${items}</ul><footer>Generado con Market Checklist</footer><script>window.onload=()=>window.print()<\/script></body></html>`);
+  popup.document.close();
 }
 
 function setCartUnitPrice(itemId, value) {

@@ -61,7 +61,6 @@ export function renderAll(db) {
   renderKPIs(db);
   renderItems(db);
   renderCart(db);
-  renderSavedLists(db);
   renderHistory(db);
   renderStats(db);
 }
@@ -143,25 +142,6 @@ export function renderItems(db) {
 /* =====================================================
    CART
 ===================================================== */
-export function renderSavedLists(db) {
-  const target = $("#savedLists");
-  if (!target) return;
-  const lists = (db.savedLists || []).slice().sort((a, b) => b.createdAt - a.createdAt);
-  if (!lists.length) {
-    target.innerHTML = `<div class="muted small">Aún no hay listas pendientes.</div>`;
-    return;
-  }
-  target.innerHTML = lists.map(list => {
-    const items = (list.items || []).map(line => {
-      const current = getItemById(db, line.itemId);
-      return `${escapeHTML(current?.name || line.name || "Producto")} x${Number(line.qty) || 1}`;
-    }).join(" · ");
-    const count = (list.items || []).reduce((sum, line) => sum + (Number(line.qty) || 1), 0);
-    const date = list.createdAt ? new Date(list.createdAt).toLocaleDateString("es-CO") : "";
-    return `<div class="item savedList"><div><div style="font-weight:800">${escapeHTML(list.name || "Lista pendiente")}</div><div class="meta"><span class="badge">${count} productos</span>${date ? `<span class="badge">${date}</span>` : ""}</div><div class="muted small savedListItems">${items || "Sin productos disponibles"}</div></div><div class="actions"><button class="mini" data-act="loadList" data-id="${list.id}">Cargar al carrito</button><button class="warn mini" data-act="deleteList" data-id="${list.id}">Eliminar</button></div></div>`;
-  }).join("");
-}
-
 export function renderCart(db) {
   const entries = Object.entries(db.cart)
     .map(([itemId, qty]) => ({ item: getItemById(db, itemId), qty }))
