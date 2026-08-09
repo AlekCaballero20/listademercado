@@ -1,7 +1,7 @@
 /* service-worker.js — Market Checklist PWA
    Optimizado para GitHub Pages / hosting estático */
 
-const VERSION = 'mc-pwa-v2.1.0-saved-lists'; // cache update for saved lists
+const VERSION = 'mc-pwa-v2.2.0-invoice-ai'; // cache update: importar factura con IA
 const STATIC_CACHE = `static-${VERSION}`;
 const RUNTIME_CACHE = `runtime-${VERSION}`;
 
@@ -26,7 +26,9 @@ const CORE_ASSETS = [
   './js/ui.actions.js',
   './js/ui.render.js',
   './js/metrics.js',
-  './js/utils.js'
+  './js/utils.js',
+  './js/invoice.js',
+  './js/invoice.parse.js'
 ];
 
 /* =========================

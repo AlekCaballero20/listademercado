@@ -22,6 +22,7 @@ Esta versión guarda la información en Cloud Firestore, en un único documento 
 - El carrito usa el último precio conocido o el precio base como sugerencia.
 - Puedes compartir el carrito como texto o abrir una versión imprimible para guardarla como PDF, sin afectar precios, historial ni compras.
 - Al guardar una compra, se actualizan últimos precios, tienda e historial.
+- Nuevo: **Importar factura con IA**. La app genera un prompt con tu catálogo actual; se lo pasas a cualquier IA junto con la factura, pegas el JSON que devuelve y la app concilia línea por línea ("así aparece en la factura → así se guarda en la app"), llena el carrito con nombres, cantidades y precios, y opcionalmente registra la compra.
 
 ## Nota técnica
 

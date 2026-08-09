@@ -2,6 +2,7 @@ import { normalizeName, uid } from "./utils.js";
 import { getDB, patch, resetDB, setDB } from "./state.js";
 import { migrate } from "./models.js";
 import { renderAll } from "./ui.render.js";
+import { bindInvoiceActions } from "./invoice.js";
 
 /* =====================================================
    INIT
@@ -69,6 +70,9 @@ export function bindActions() {
   });
   document.querySelector("#importFile").addEventListener("change", handleImportFile);
   document.querySelector("#btnExportCSV").addEventListener("click", exportCSV);
+
+  // Importar factura con IA
+  bindInvoiceActions();
 }
 
 /* =====================================================

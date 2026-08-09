@@ -150,6 +150,14 @@
 
         <div class="hr"></div>
 
+        <div class="title">Importar factura con IA</div>
+        <div class="sub">Copia el prompt, pásaselo a una IA junto con la foto de la factura y pega aquí la respuesta. El carrito se llena solo.</div>
+        <div class="row" style="margin-top:8px">
+          <button class="ghost mini" id="btnInvoiceImport" style="flex:1">🧾 Importar factura</button>
+        </div>
+
+        <div class="hr"></div>
+
         <div class="title">Finalizar compra</div>
         <div class="row" style="margin-top:8px">
           <select id="buyType" style="flex:1;min-width:160px">
@@ -232,6 +240,45 @@
   <div class="row" style="margin-top:12px;justify-content:flex-end;gap:8px">
     <button class="ghost mini" id="editCancel">Cancelar</button>
     <button class="ok mini" id="editSave">💾 Guardar</button>
+  </div>
+</dialog>
+
+<dialog id="invoiceDialog" class="wide" aria-labelledby="invoiceDialogTitle">
+  <div class="title" id="invoiceDialogTitle">🧾 Importar factura con IA</div>
+  <div class="sub">Tres pasos: copiar el prompt, pegar la respuesta, revisar la conciliación.</div>
+
+  <div class="hr"></div>
+
+  <div class="title small">1 · Copia este prompt y dáselo a la IA con la factura</div>
+  <div class="sub small">Ya incluye tu catálogo actual, así la IA usa los nombres que tú usas.</div>
+  <textarea id="invoicePrompt" rows="6" readonly style="width:100%;margin-top:8px;font-size:12px"></textarea>
+  <div class="row" style="margin-top:8px;align-items:center">
+    <button class="ghost mini" id="invoiceCopyPrompt">📋 Copiar prompt</button>
+    <span class="small muted" id="invoiceCopyHint"></span>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="title small">2 · Pega aquí la respuesta de la IA</div>
+  <div class="sub small">Pega todo tal cual, con el bloque ```json incluido si viene.</div>
+  <textarea id="invoiceResponse" rows="6" placeholder='{ "factura": { ... }, "lineas": [ ... ] }' style="width:100%;margin-top:8px;font-size:12px"></textarea>
+  <div class="row" style="margin-top:8px">
+    <button class="mini" id="invoiceAnalyze">🔍 Analizar y conciliar</button>
+  </div>
+  <div id="invoiceError" class="small" style="color:var(--warn);min-height:18px;margin-top:6px"></div>
+
+  <div id="invoiceReviewWrap" hidden>
+    <div class="hr"></div>
+    <div class="title small">3 · Conciliación</div>
+    <div class="sub small">Izquierda: así aparece en la factura. Derecha: así se guarda en la app. Cambia lo que no cuadre.</div>
+    <div style="height:10px"></div>
+    <div id="invoiceReview"></div>
+  </div>
+
+  <div class="row" style="margin-top:14px;justify-content:flex-end;gap:8px;flex-wrap:wrap">
+    <button class="ghost mini" id="invoiceClose">Cerrar</button>
+    <button class="mini" id="invoiceApply">🛒 Llenar carrito</button>
+    <button class="ok mini" id="invoiceApplyBuy">✅ Llenar y registrar compra</button>
   </div>
 </dialog>
 
